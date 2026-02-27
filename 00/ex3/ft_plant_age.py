@@ -1,5 +1,3 @@
-
-
 def ft_plant_age():
     days = int(input("Enter plant age in days: "))
     if days > 60:

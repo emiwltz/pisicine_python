@@ -1,10 +1,11 @@
-def count_helper(days: int, count: int):
-    print("Day: ", count)
-    if count >= days - 1:
-        print("Harvest time!")
+def count_helper(current_day: int, total_days: int):
+    if current_day > total_days:
         return
-    count_helper(days, count + 1)
+    print(f"Day {current_day}")
+    count_helper(current_day + 1, total_days)
+
+
 def ft_count_harvest_recursive():
     days = int(input("Days until harvest: "))
-    count = 1
-    count_helper(days, count)
+    count_helper(1, days)
+    print("Harvest time!")
