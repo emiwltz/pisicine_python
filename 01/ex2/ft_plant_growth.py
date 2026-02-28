@@ -17,6 +17,7 @@ def main():
 	p2 = Plant("tournesol", 34, 12)
 	p3 = Plant("coquelicot", 5, 34)
 	plants = [p1,p2,p3]
+	start = p1.height
 	print("\n=== Day 1 ===")
 	for plant in plants:
 		print(plant.get_info())
@@ -27,6 +28,8 @@ def main():
 	print("\n=== Day 7 ===")
 	for plant in plants:
 		print(plant.get_info())
+	growth = p1.height - start
+	print(f"Growth this week: +{growth}cm")
 
 
 if __name__ == "__main__":

@@ -10,8 +10,6 @@ def	main():
 	p2 = Plant("tournesol", 34, 12)
 	p3 = Plant("coquelicot", 5, 34)
 	plants = [p1, p2 , p3]
-	for plant in plants:
-		plant.name = plant.name.capitalize()
 	print("=== Garden Plant Registry ===")
 	for plant in plants:
 		print(f"{plant.name}: {plant.height}cm, {plant.age} days old")
