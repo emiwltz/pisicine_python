@@ -5,6 +5,8 @@ class Plant:
         self.height = height
         self.age_days = age_days
 
+    if name < 0:
+        return("error")
     def grow(self):
         self.height = self.height + 1
 
