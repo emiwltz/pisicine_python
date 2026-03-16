@@ -1,15 +1,16 @@
+class GardenError:
+    pass
+
+
 class GardenManager:
     def __init__(self):
         self.plants = []
 
-    def add_plant(self, plant: str):
+    def add_plant(self, plant: "Plant"):
         if not plant.name:
             raise ValueError("Plant name cannot be empty")
         else:
             self.plants.append(plant)
-
-    def check_health(self):
-        for plant in self.plants:
 
     def water_plant(self):
         print("Opening watering level")
@@ -20,15 +21,16 @@ class GardenManager:
 
 
 class Plant:
-    def __init__(self, name: str):
+    def __init__(self, name: str, water_level: int, sun_level: int):
         self.name = name
-        self.water_level = 0
+        self.water_level = water_level
+        self.sun_level = sun_level
 
 
 def test_garden_management():
-    tomato = Plant("tomato")
-    cactus = Plant("cactus")
-    empty = Plant("")
+    tomato = Plant("tomato", 23, 10)
+    cactus = Plant("cactus", 7, 2)
+    empty = Plant("", 2, 3)
     garden = GardenManager()
     garden.add_plant(tomato)
     garden.add_plant(cactus)
