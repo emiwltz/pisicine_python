@@ -42,10 +42,13 @@ def event_analytics(event_nbr: int):
 
 
 def fibonacci_generator(fib_nbr: int):
-    i = 1
+    a = 0
+    b = 1
     for i in range(fib_nbr):
-        i += i
-        yield i
+        yield a
+        tmp = a
+        a = b
+        b = tmp + b
 
 
 def fibonacci_display(fib_nbr: int):
@@ -53,9 +56,20 @@ def fibonacci_display(fib_nbr: int):
         print(i)
 
 
+def prime_generator(prime_nbr: int):
+    for i in range(prime_nbr):
+        if is 
+
+
+def prime_display(prime_nbr: int):
+    for i in prime_generator(prime_nbr_nbr):
+        print(i)
+
+
 def main():
     event_analytics(1000)
     fibonacci_display(10)
+    prime_display(10)
 
 
 if __name__ == "__main__":
