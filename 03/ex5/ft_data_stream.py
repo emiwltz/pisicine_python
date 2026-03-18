@@ -1,12 +1,13 @@
-
 def generate_event(event_nbr: int):
     players = ("alice", "bob", "charlie")
-    actions = ("killed monster", "leveled up",
-               "found treasure", "helped a friend")
+    actions = ("killed monster", "leveled up", "found treasure", "helped a friend")
     levels = (2, 3, 12, 4, 5, 8, 15)
     for i in range(event_nbr):
-        event = (players[i % len(players)], levels[i %
-                 len(levels)], actions[i % len(actions)])
+        event = (
+            players[i % len(players)],
+            levels[i % len(levels)],
+            actions[i % len(actions)],
+        )
         yield event
 
 
@@ -27,8 +28,7 @@ def event_analytics(event_nbr: int):
         elif action == "found treasure":
             treasure_event += 1
         if total_event <= 3:
-            print(f"Event {total_event}: Player {
-                  player} (level {level}) {action}")
+            print(f"Event {total_event}: Player {player} (level {level}) {action}")
     if total_event > 3:
         print("...")
     print()
@@ -56,14 +56,35 @@ def fibonacci_display(fib_nbr: int):
         print(i)
 
 
-def prime_generator(prime_nbr: int):
-    for i in range(prime_nbr):
-        if is 
+def is_prime(n: int) -> bool:
+    if n < 2:
+        return False
+    for divisor in range(2, n):
+        if n % divisor == 0:
+            return False
+    return True
 
 
-def prime_display(prime_nbr: int):
-    for i in prime_generator(prime_nbr_nbr):
-        print(i)
+def prime_generator(count: int):
+    found = 0
+    candidate = 2
+
+    while found < count:
+        if is_prime(candidate):
+            yield candidate
+            found += 1
+        candidate += 1
+
+
+def prime_display(count: int):
+    print(f"Prime numbers (first {count}): ", end="")
+    first = True
+    for prime in prime_generator(count):
+        if not first:
+            print(", ", end="")
+        print(prime, end="")
+        first = False
+    print()
 
 
 def main():
