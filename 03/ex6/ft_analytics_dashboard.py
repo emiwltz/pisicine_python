@@ -13,10 +13,34 @@ def dict_comprehensions(players: list):
     print("=== Dict Comprehension Examples ===")
     player_scores = {x.get("name"): x.get("score") for x in players}
     print(f"Player scores: {player_scores}")
+    score_categories = {
+        "high": len([x for x in players if x["score"] > 300]),
+        "medium": len([x for x in players if 200 <= x["score"] <= 300]),
+        "low": len([x for x in players if x["score"] < 200]),
+    }
+    print(f"Score categories: {score_categories}")
+    acheivement_count = {x.get("name"): len(x.get("achievements")) for x in players}
+    print(f"Achievement counts: {acheivement_count}")
+    print()
 
 
 def set_comprehensions(players: list):
-    pass
+    print("=== Set Comprehension Examples ===")
+    unique_players = {x.get("name") for x in players}
+    print(f"Unique players: {unique_players}")
+    unique_achievements = {
+        achievments for x in players for achievments in x.get("achievements")
+    }
+    print(f"Unique achievements: {unique_achievements}")
+    active_region = {region.get("region") for region in players}
+    print(f"Active regions: {active_region}")
+    print()
+    print("=== Combined Analysis ===")
+    print(f"Total players: {len(unique_players)}")
+    print(f"Total unique achievements: {len(unique_achievements)}")
+    score = [x.get("score") for x in players]
+    print(f"Average score: {sum(score) / len(score)}")
+    print(f"Top performer: ")
 
 
 def main():
