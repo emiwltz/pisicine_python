@@ -1,29 +1,65 @@
-import sys
 import math
 
 
-def parsing(string: str):
+def parse_coordinates(string: str) -> tuple[int, int, int] | None:
     coordinates = string.split(",")
-    for i in range(len(coordinates)):
-        try:
-            coordinates[i] = int(coordinates[i])
-        except ValueError:
-            print(f"{i} is not an int")
-            return
-    coordinates = tuple(coordinates)
-    print(coordinates)
-    start = (0, 0, 0)
-    x1, y1, z1 = start
-    x2, y2, z2 = coordinates
-    distance = math.sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)
-    print(distance)
+    if len(coordinates) != 3:
+        print("Error parsing coordinates: expected 3 comma-separated values")
+        return None
+
+    try:
+        x_value = int(coordinates[0])
+        y_value = int(coordinates[1])
+        z_value = int(coordinates[2])
+    except ValueError as error:
+        print(f"Error parsing coordinates: {error}")
+        print(
+            "Error details - Type: "
+            f"{error.__class__.__name__}, Args: {error.args}"
+        )
+        return None
+
+    return tuple([x_value, y_value, z_value])
 
 
-def main():
-    if len(sys.argv) <= 1:
-        print("No argments passed")
-    else:
-        parsing(sys.argv[1])
+def distance_from_origin(position: tuple[int, int, int]) -> float:
+    x_value, y_value, z_value = position
+    return math.sqrt((x_value ** 2) + (y_value ** 2) + (z_value ** 2))
+
+
+def main() -> None:
+    print("=== Game Coordinate System ===")
+    print()
+
+    start_position = tuple([10, 20, 5])
+    print(f"Position created: {start_position}")
+    print(
+        "Distance between (0, 0, 0) and "
+        f"{start_position}: {distance_from_origin(start_position):.2f}"
+    )
+    print()
+
+    valid_string = "3,4,0"
+    print(f'Parsing coordinates: "{valid_string}"')
+    parsed_position = parse_coordinates(valid_string)
+    if parsed_position is not None:
+        print(f"Parsed position: {parsed_position}")
+        print(
+            "Distance between (0, 0, 0) and "
+            f"{parsed_position}: {distance_from_origin(parsed_position)}"
+        )
+    print()
+
+    invalid_string = "abc,def,ghi"
+    print(f'Parsing invalid coordinates: "{invalid_string}"')
+    parse_coordinates(invalid_string)
+    print()
+
+    if parsed_position is not None:
+        print("Unpacking demonstration:")
+        x_value, y_value, z_value = parsed_position
+        print(f"Player at x={x_value}, y={y_value}, z={z_value}")
+        print(f"Coordinates: X={x_value}, Y={y_value}, Z={z_value}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 class GardenError(Exception):
     pass
 
@@ -24,18 +25,21 @@ def check_water_tank(liters: int) -> None:
 
 def test_custom_errors() -> None:
     print("=== Custom Garden Errors Demo ===")
+    print()
 
-    print("Testing PlantError.")
+    print("Testing PlantError...")
     try:
         check_plant(10)
     except PlantError as error:
         print(f"Caught PlantError: {error}")
+    print()
 
-    print("Testing WaterError.")
+    print("Testing WaterError...")
     try:
         check_water_tank(5)
     except WaterError as error:
         print(f"Caught WaterError: {error}")
+    print()
 
     print("Testing catching all garden errors...")
     try:
@@ -47,6 +51,7 @@ def test_custom_errors() -> None:
         check_water_tank(5)
     except GardenError as error:
         print(f"Caught a garden error: {error}")
+    print()
 
     print("All custom error types work correctly!")
 

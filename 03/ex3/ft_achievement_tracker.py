@@ -1,21 +1,29 @@
-def set_analytics(alice: set, bob: set, charlie: set):
+def set_analytics(
+    alice: set[str],
+    bob: set[str],
+    charlie: set[str],
+) -> None:
+    all_achievements = alice.union(bob).union(charlie)
+    common_achievements = alice.intersection(bob).intersection(charlie)
+    rare_achievements = (
+        alice.difference(bob).difference(charlie)
+        .union(bob.difference(alice).difference(charlie))
+        .union(charlie.difference(alice).difference(bob))
+    )
+
     print("=== Achievement Analytics ===")
-    print(f"All unique achievements: {charlie.union(bob).union(alice)}")
-    print(f"Total unique achievements: {len(charlie.union(bob).union(alice))}")
+    print(f"All unique achievements: {all_achievements}")
+    print(f"Total unique achievements: {len(all_achievements)}")
     print()
-    print(f"Common to all players: {charlie.intersection(bob).intersection(alice)}")
-    bob_unique = bob.difference(charlie).difference(alice)
-    alice_unique = alice.difference(charlie).difference(bob)
-    charlie_unique = charlie.difference(bob).difference(alice)
-    rare_item = bob_unique.union(charlie_unique).union(alice_unique)
-    print(f"Rare achievements (1 player): {rare_item}")
+    print(f"Common to all players: {common_achievements}")
+    print(f"Rare achievements (1 player): {rare_achievements}")
     print()
     print(f"Alice vs Bob common: {alice.intersection(bob)}")
     print(f"Alice unique: {alice.difference(bob)}")
     print(f"Bob unique: {bob.difference(alice)}")
 
 
-def main():
+def main() -> None:
     alice = {"first_kill", "level_10", "treasure_hunter", "speed_demon"}
     bob = {"first_kill", "level_10", "boss_slayer", "collector"}
     charlie = {
@@ -25,10 +33,12 @@ def main():
         "speed_demon",
         "perfectionist",
     }
+
     print("=== Achievement Tracker System ===")
-    print(f"Alice achievement: {alice}")
-    print(f"Bob achievement: {bob}")
-    print(f"Charlie achievement: {charlie}")
+    print()
+    print(f"Player alice achievements: {alice}")
+    print(f"Player bob achievements: {bob}")
+    print(f"Player charlie achievements: {charlie}")
     print()
     set_analytics(alice, bob, charlie)
 

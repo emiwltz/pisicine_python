@@ -1,37 +1,43 @@
 #!/usr/bin/env python3
+
+
 class Plant:
     def __init__(self, name: str, height: int, age_days: int) -> None:
         self.name = name
         self.height = height
         self.age_days = age_days
 
-    def grow(self):
-        self.height = self.height + 1
+    def grow(self) -> None:
+        self.height += 1
 
-    def age(self):
-        self.age_days = self.age_days + 1
+    def age(self) -> None:
+        self.age_days += 1
 
-    def get_info(self):
-        return (f"{self.name}: {self.height}cm, {self.age_days} days old")
+    def get_info(self) -> str:
+        return f"{self.name}: {self.height}cm, {self.age_days} days old"
 
 
-def main():
-    p1 = Plant("Tulipe", 23, 12)
-    p2 = Plant("tournesol", 34, 12)
-    p3 = Plant("coquelicot", 5, 34)
-    plants = [p1, p2, p3]
-    start = p1.height
-    print("\n=== Day 1 ===")
+def main() -> None:
+    plant_1 = Plant("Tulipe", 23, 12)
+    plant_2 = Plant("Tournesol", 34, 12)
+    plant_3 = Plant("Coquelicot", 5, 34)
+    plants = [plant_1, plant_2, plant_3]
+    start_height = plant_1.height
+
+    print("=== Day 1 ===")
     for plant in plants:
         print(plant.get_info())
-    for days in range(6):
+
+    for _ in range(6):
         for plant in plants:
             plant.grow()
             plant.age()
-    print("\n=== Day 7 ===")
+
+    print("=== Day 7 ===")
     for plant in plants:
         print(plant.get_info())
-    growth = p1.height - start
+
+    growth = plant_1.height - start_height
     print(f"Growth this week: +{growth}cm")
 
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 
-def water_plants(plant_list: list) -> None:
+def water_plants(plant_list: list[str | None]) -> None:
     print("Opening watering system")
     try:
         for plant in plant_list:
-            if plant is None:
+            if not plant:
                 raise ValueError(f"Cannot water {plant} - invalid plant!")
             print(f"Watering {plant}")
     finally:
@@ -14,16 +14,16 @@ def water_plants(plant_list: list) -> None:
 
 def test_watering_system() -> None:
     print("=== Garden Watering System ===")
+    print()
 
-    print("Testing normal watering.")
+    print("Testing normal watering...")
     good_list = ["tomato", "lettuce", "carrots"]
     try:
         water_plants(good_list)
         print("Watering completed successfully!")
     except ValueError as error:
         print(f"Error: {error}")
-    finally:
-        print("Normal test finished.")
+    print()
 
     print("Testing with error...")
     bad_list = ["tomato", None, "carrots"]
@@ -32,8 +32,9 @@ def test_watering_system() -> None:
         print("Watering completed successfully!")
     except ValueError as error:
         print(f"Error: {error}")
-    finally:
-        print("Cleanup always happens, even with errors!")
+    print()
+
+    print("Cleanup always happens, even with errors!")
 
 
 def main() -> None:

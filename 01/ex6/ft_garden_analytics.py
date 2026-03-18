@@ -1,5 +1,5 @@
 class Plant:
-    def __init__(self, name: str, height: int, age: int):
+    def __init__(self, name: str, height: int, age: int) -> None:
         self.name = name
         self.set_height(height)
         self.set_age(age)
@@ -35,7 +35,7 @@ class Plant:
 
 
 class FloweringPlant(Plant):
-    def __init__(self, name: str, height: int, age: int, color: str):
+    def __init__(self, name: str, height: int, age: int, color: str) -> None:
         super().__init__(name, height, age)
         self.color = color
         self.blooming = False
@@ -66,8 +66,8 @@ class PrizeFlower(FloweringPlant):
         height: int,
         age: int,
         color: str,
-        prize_points: int
-    ):
+        prize_points: int,
+    ) -> None:
         super().__init__(name, height, age, color)
         self.prize_points = prize_points
 
@@ -81,13 +81,13 @@ class PrizeFlower(FloweringPlant):
 
 
 class Garden:
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name = name
-        self.plants = []
+        self.plants: list[Plant] = []
         self.plants_added = 0
         self.total_growth = 0
 
-    def add_plant(self, plant: "Plant") -> str:
+    def add_plant(self, plant: Plant) -> str:
         self.plants.append(plant)
         self.plants_added += 1
         return f"Added {plant.name} to {self.name}'s garden"
@@ -122,9 +122,9 @@ class GardenManager:
             prize = 0
 
             for plant in garden.plants:
-                if type(plant) is PrizeFlower:
+                if isinstance(plant, PrizeFlower):
                     prize += 1
-                elif type(plant) is FloweringPlant:
+                elif isinstance(plant, FloweringPlant):
                     flowering += 1
                 else:
                     regular += 1
@@ -135,17 +135,17 @@ class GardenManager:
             score = 0
 
             for plant in garden.plants:
-                if type(plant) is PrizeFlower:
+                if isinstance(plant, PrizeFlower):
                     score += plant.height + 20 + plant.prize_points
-                elif type(plant) is FloweringPlant:
+                elif isinstance(plant, FloweringPlant):
                     score += plant.height + 10
                 else:
                     score += plant.height
             return score
 
-    def __init__(self, network_name: str):
+    def __init__(self, network_name: str) -> None:
         self.network_name = network_name
-        self.gardens = []
+        self.gardens: list[Garden] = []
 
     @classmethod
     def create_garden_network(cls, name: str) -> "GardenManager":
@@ -159,11 +159,11 @@ class GardenManager:
     def validate_height(height: int) -> bool:
         return height >= 0
 
-    def add_garden(self, garden: "Garden") -> None:
+    def add_garden(self, garden: Garden) -> None:
         self.gardens.append(garden)
         GardenManager.total_gardens_managed += 1
 
-    def get_garden(self, name: str):
+    def get_garden(self, name: str) -> "Garden | None":
         for garden in self.gardens:
             if garden.name == name:
                 return garden
@@ -174,9 +174,7 @@ class GardenManager:
         if garden is None:
             return "Garden not found"
 
-        regular, flowering, prize = (
-            self.GardenStats.count_plant_types(garden)
-        )
+        regular, flowering, prize = self.GardenStats.count_plant_types(garden)
 
         report = f"=== {garden.name}'s Garden Report ===\n"
         report += "Plants in garden:\n"
@@ -203,9 +201,7 @@ class GardenManager:
 
 
 def main() -> None:
-    manager = GardenManager.create_garden_network(
-        "Community Garden Network"
-    )
+    manager = GardenManager.create_garden_network("Community Garden Network")
 
     alice_garden = Garden("Alice")
     bob_garden = Garden("Bob")
@@ -216,14 +212,15 @@ def main() -> None:
     oak = Plant("Oak Tree", 100, 365)
     rose = FloweringPlant("Rose", 25, 30, "red")
     sunflower = PrizeFlower("Sunflower", 50, 45, "yellow", 10)
-
     fern = Plant("Fern", 40, 120)
     lily = FloweringPlant("Lily", 42, 20, "white")
 
     print("=== Garden Management System Demo ===")
+    print()
     print(alice_garden.add_plant(oak))
     print(alice_garden.add_plant(rose))
     print(alice_garden.add_plant(sunflower))
+    print()
 
     bob_garden.add_plant(fern)
     bob_garden.add_plant(lily)
@@ -231,7 +228,9 @@ def main() -> None:
     for message in alice_garden.grow_all():
         print(message)
 
+    print()
     print(manager.build_garden_report("Alice"))
+    print()
     print(f"Height validation test: {GardenManager.validate_height(25)}")
     print(manager.get_scores_summary())
     print(
