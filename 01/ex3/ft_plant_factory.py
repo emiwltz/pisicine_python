@@ -22,10 +22,10 @@ def main() -> None:
     heights = [25, 200, 5, 80, 15]
     ages = [30, 365, 90, 45, 120]
     garden_size = 5
-    plants = [None] * garden_size
+    plants = []
 
     for index in range(garden_size):
-        plants[index] = Plant(names[index], heights[index], ages[index])
+        plants.append(Plant(names[index], heights[index], ages[index]))
 
     print("=== Plant Factory Output ===")
     for index in range(garden_size):
