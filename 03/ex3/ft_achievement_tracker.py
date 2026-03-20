@@ -1,46 +1,97 @@
-def set_analytics(
-    alice: set[str],
-    bob: set[str],
-    charlie: set[str],
-) -> None:
-    all_achievements = alice.union(bob).union(charlie)
-    common_achievements = alice.intersection(bob).intersection(charlie)
-    rare_achievements = (
-        alice.difference(bob).difference(charlie)
-        .union(bob.difference(alice).difference(charlie))
-        .union(charlie.difference(alice).difference(bob))
-    )
+import random
 
-    print("=== Achievement Analytics ===")
-    print(f"All unique achievements: {all_achievements}")
-    print(f"Total unique achievements: {len(all_achievements)}")
-    print()
-    print(f"Common to all players: {common_achievements}")
-    print(f"Rare achievements (1 player): {rare_achievements}")
-    print()
-    print(f"Alice vs Bob common: {alice.intersection(bob)}")
-    print(f"Alice unique: {alice.difference(bob)}")
-    print(f"Bob unique: {bob.difference(alice)}")
+
+ACHIEVEMENTS = [
+    "Crafting Genius",
+    "World Savior",
+    "Master Explorer",
+    "Collector Supreme",
+    "Untouchable",
+    "Boss Slayer",
+    "Strategist",
+    "Speed Runner",
+    "Survivor",
+    "Treasure Hunter",
+    "Hidden Path Finder",
+    "Sharp Mind",
+]
+
+
+def gen_player_achievements() -> set[str]:
+    achievement_count = random.randint(5, 9)
+    return set(random.sample(ACHIEVEMENTS, achievement_count))
+
+
+def get_all_distinct_achievements(
+    players: list[tuple[str, set[str]]],
+) -> set[str]:
+    distinct_achievements: set[str] = set()
+    for _, achievements in players:
+        distinct_achievements = distinct_achievements.union(achievements)
+    return distinct_achievements
+
+
+def get_common_achievements(
+    players: list[tuple[str, set[str]]],
+) -> set[str]:
+    common_achievements = set(ACHIEVEMENTS)
+    for _, achievements in players:
+        common_achievements = common_achievements.intersection(
+            achievements
+        )
+    return common_achievements
+
+
+def get_unique_achievements(
+    players: list[tuple[str, set[str]]],
+    player_index: int,
+) -> set[str]:
+    other_achievements: set[str] = set()
+    current_index = 0
+    while current_index < len(players):
+        if current_index != player_index:
+            other_achievements = other_achievements.union(
+                players[current_index][1]
+            )
+        current_index += 1
+    return players[player_index][1].difference(other_achievements)
 
 
 def main() -> None:
-    alice = {"first_kill", "level_10", "treasure_hunter", "speed_demon"}
-    bob = {"first_kill", "level_10", "boss_slayer", "collector"}
-    charlie = {
-        "level_10",
-        "treasure_hunter",
-        "boss_slayer",
-        "speed_demon",
-        "perfectionist",
-    }
+    players = [
+        ("Alice", gen_player_achievements()),
+        ("Bob", gen_player_achievements()),
+        ("Charlie", gen_player_achievements()),
+        ("Dylan", gen_player_achievements()),
+    ]
 
     print("=== Achievement Tracker System ===")
     print()
-    print(f"Player alice achievements: {alice}")
-    print(f"Player bob achievements: {bob}")
-    print(f"Player charlie achievements: {charlie}")
+
+    for player_name, achievements in players:
+        print(f"Player {player_name}: {achievements}")
     print()
-    set_analytics(alice, bob, charlie)
+
+    all_distinct_achievements = get_all_distinct_achievements(players)
+    common_achievements = get_common_achievements(players)
+
+    print(f"All distinct achievements: {all_distinct_achievements}")
+    print()
+    print(f"Common achievements: {common_achievements}")
+    print()
+
+    player_index = 0
+    while player_index < len(players):
+        player_name = players[player_index][0]
+        unique_achievements = get_unique_achievements(players, player_index)
+        print(f"Only {player_name} has: {unique_achievements}")
+        player_index += 1
+    print()
+
+    full_achievement_set = set(ACHIEVEMENTS)
+    for player_name, achievements in players:
+        missing_achievements = full_achievement_set.difference(achievements)
+        print(f"{player_name} is missing: {missing_achievements}")
 
 
 if __name__ == "__main__":

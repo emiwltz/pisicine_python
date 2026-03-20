@@ -1,127 +1,92 @@
 import sys
 
 
-def total_items(inventory: dict[str, int]) -> int:
-    total = 0
-    for quantity in inventory.values():
-        total += quantity
-    return total
+def parse_inventory(parameters: list[str]) -> dict[str, int]:
+    inventory: dict[str, int] = {}
 
+    for parameter in parameters:
+        parts = parameter.split(":")
+        if len(parts) != 2 or parts[0] == "" or parts[1] == "":
+            print(f"Error - invalid parameter '{parameter}'")
+            continue
 
-def parse_inventory(items: list[str]) -> dict[str, int] | None:
-    inventory: dict[str, int] = dict()
-
-    for item in items:
-        parts = item.split(":")
-        if len(parts) != 2 or not parts[0] or not parts[1]:
-            print(f"Invalid inventory entry: {item}")
-            return None
+        item_name = parts[0]
+        if item_name in inventory:
+            print(f"Redundant item '{item_name}' - discarding")
+            continue
 
         try:
             quantity = int(parts[1])
-        except ValueError:
-            print(f"Invalid quantity for {parts[0]}: {parts[1]}")
-            return None
+        except ValueError as error:
+            print(f"Quantity error for '{item_name}': {error}")
+            continue
 
-        inventory.update({parts[0]: quantity})
-
+        inventory.update({item_name: quantity})
     return inventory
 
 
-def system_analysis(inventory: dict[str, int]) -> None:
-    total_quantity = total_items(inventory)
-    most_abundant_name = ""
-    most_abundant_value = -1
-    least_abundant_name = ""
-    least_abundant_value = -1
-    abundant = dict()
-    moderate = dict()
-    scarce = dict()
-    restock = []
+def get_most_abundant_item(inventory: dict[str, int]) -> str:
+    item_list = list(inventory.keys())
+    most_abundant_item = item_list[0]
 
-    print("=== Inventory System Analysis ===")
-    print(f"Total items in inventory: {total_quantity}")
-    print(f"Unique item types: {len(inventory)}")
-    print()
+    for item_name in item_list[1:]:
+        if inventory[item_name] > inventory[most_abundant_item]:
+            most_abundant_item = item_name
+    return most_abundant_item
 
-    print("=== Current Inventory ===")
-    for name, quantity in inventory.items():
-        percentage = (quantity * 100) / total_quantity
-        unit_label = "unit" if quantity == 1 else "units"
-        print(f"{name}: {quantity} {unit_label} ({percentage:.1f}%)")
 
-        if quantity > most_abundant_value:
-            most_abundant_name = name
-            most_abundant_value = quantity
+def get_least_abundant_item(inventory: dict[str, int]) -> str:
+    item_list = list(inventory.keys())
+    least_abundant_item = item_list[0]
 
-        if least_abundant_value == -1 or quantity < least_abundant_value:
-            least_abundant_name = name
-            least_abundant_value = quantity
+    for item_name in item_list[1:]:
+        if inventory[item_name] < inventory[least_abundant_item]:
+            least_abundant_item = item_name
+    return least_abundant_item
 
-        if quantity > 5:
-            abundant.update({name: quantity})
-        elif quantity < 4:
-            scarce.update({name: quantity})
-        else:
-            moderate.update({name: quantity})
 
-        if quantity <= 1:
-            restock.append(name)
-    print()
+def print_inventory_analysis(inventory: dict[str, int]) -> None:
+    item_list = list(inventory.keys())
+    total_quantity = sum(inventory.values())
 
-    print("=== Inventory Statistics ===")
+    print(f"Got inventory: {inventory}")
+    print(f"Item list: {item_list}")
     print(
-        f"Most abundant: {most_abundant_name} "
-        f"({most_abundant_value} units)"
+        f"Total quantity of the {len(item_list)} items: {total_quantity}"
     )
-    least_unit_label = "unit" if least_abundant_value == 1 else "units"
-    print(
-        f"Least abundant: {least_abundant_name} "
-        f"({least_abundant_value} {least_unit_label})"
-    )
-    print()
 
-    print("=== Item Categories ===")
-    if abundant:
-        print(f"Abundant: {abundant}")
-    if moderate:
-        print(f"Moderate: {moderate}")
-    if scarce:
-        print(f"Scarce: {scarce}")
-    print()
+    if total_quantity > 0:
+        for item_name in inventory:
+            percentage = round(
+                (inventory[item_name] * 100) / total_quantity,
+                1,
+            )
+            print(f"Item {item_name} represents {percentage}%")
 
-    print("=== Management Suggestions ===")
-    if restock:
-        print(f"Restock needed: {', '.join(restock)}")
+        most_abundant_item = get_most_abundant_item(inventory)
+        least_abundant_item = get_least_abundant_item(inventory)
+        print(
+            "Item most abundant: "
+            f"{most_abundant_item} with quantity "
+            f"{inventory[most_abundant_item]}"
+        )
+        print(
+            "Item least abundant: "
+            f"{least_abundant_item} with quantity "
+            f"{inventory[least_abundant_item]}"
+        )
     else:
-        print("No restock needed")
-    print()
+        print("Item most abundant: none")
+        print("Item least abundant: none")
 
-    print("=== Dictionary Properties Demo ===")
-    print(f"Dictionary keys: {', '.join(inventory.keys())}")
-    values_text = []
-    for value in inventory.values():
-        values_text.append(str(value))
-    print(f"Dictionary values: {', '.join(values_text)}")
-    print(
-        "Sample lookup - 'sword' in inventory: "
-        f"{inventory.get('sword') is not None}"
-    )
+    inventory.update({"magic_item": 1})
+    print(f"Updated inventory: {inventory}")
 
 
 def main() -> None:
-    if len(sys.argv) <= 1:
-        print(
-            "No inventory provided. Usage: "
-            "python3 ft_inventory_system.py item:quantity ..."
-        )
-        return
-
+    print("=== Inventory System Analysis ===")
     inventory = parse_inventory(sys.argv[1:])
-    if inventory is None:
-        return
-
-    system_analysis(inventory)
+    print_inventory_analysis(inventory)
 
 
 if __name__ == "__main__":

@@ -11,15 +11,21 @@ def main() -> None:
         )
         return
 
-    scores = []
+    scores: list[int] = []
     index = 1
     while index < len(sys.argv):
         try:
             scores.append(int(sys.argv[index]))
         except ValueError:
-            print(f"Error: '{sys.argv[index]}' is not a valid score")
-            return
+            print(f"Invalid parameter: '{sys.argv[index]}'")
         index += 1
+
+    if len(scores) == 0:
+        print(
+            "No scores provided. Usage: "
+            "python3 ft_score_analytics.py <score1> <score2> ..."
+        )
+        return
 
     print(f"Scores processed: {scores}")
     print(f"Total players: {len(scores)}")

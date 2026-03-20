@@ -1,65 +1,82 @@
 import math
 
 
-def parse_coordinates(string: str) -> tuple[int, int, int] | None:
-    coordinates = string.split(",")
-    if len(coordinates) != 3:
-        print("Error parsing coordinates: expected 3 comma-separated values")
-        return None
-
-    try:
-        x_value = int(coordinates[0])
-        y_value = int(coordinates[1])
-        z_value = int(coordinates[2])
-    except ValueError as error:
-        print(f"Error parsing coordinates: {error}")
-        print(
-            "Error details - Type: "
-            f"{error.__class__.__name__}, Args: {error.args}"
+def get_player_pos() -> tuple[float, float, float]:
+    while True:
+        coordinates_input = input(
+            "Enter new coordinates as floats in format 'x,y,z': "
         )
-        return None
+        coordinates = coordinates_input.split(",")
+        if len(coordinates) != 3:
+            print("Invalid syntax")
+            continue
 
-    return tuple([x_value, y_value, z_value])
+        values: list[str] = []
+        for coordinate in coordinates:
+            values.append(coordinate.strip())
+
+        parsed_values: list[float] = []
+        has_error = False
+        for value in values:
+            try:
+                parsed_values.append(float(value))
+            except ValueError as error:
+                print(f"Error on parameter '{value}': {error}")
+                has_error = True
+                break
+
+        if has_error:
+            continue
+        return (
+            parsed_values[0],
+            parsed_values[1],
+            parsed_values[2],
+        )
 
 
-def distance_from_origin(position: tuple[int, int, int]) -> float:
+def distance_to_center(position: tuple[float, float, float]) -> float:
     x_value, y_value, z_value = position
     return math.sqrt((x_value ** 2) + (y_value ** 2) + (z_value ** 2))
+
+
+def distance_between(
+    start_position: tuple[float, float, float],
+    end_position: tuple[float, float, float],
+) -> float:
+    return math.sqrt(
+        ((end_position[0] - start_position[0]) ** 2)
+        + ((end_position[1] - start_position[1]) ** 2)
+        + ((end_position[2] - start_position[2]) ** 2)
+    )
 
 
 def main() -> None:
     print("=== Game Coordinate System ===")
     print()
 
-    start_position = tuple([10, 20, 5])
-    print(f"Position created: {start_position}")
+    print("Get a first set of coordinates")
+    first_position = get_player_pos()
+    print(f"Got a first tuple: {first_position}")
+    print()
+
     print(
-        "Distance between (0, 0, 0) and "
-        f"{start_position}: {distance_from_origin(start_position):.2f}"
+        f"It includes: X={first_position[0]}, "
+        f"Y={first_position[1]}, Z={first_position[2]}"
     )
+    first_distance = round(distance_to_center(first_position), 4)
+    print(f"Distance to center: {first_distance:.4f}")
     print()
 
-    valid_string = "3,4,0"
-    print(f'Parsing coordinates: "{valid_string}"')
-    parsed_position = parse_coordinates(valid_string)
-    if parsed_position is not None:
-        print(f"Parsed position: {parsed_position}")
-        print(
-            "Distance between (0, 0, 0) and "
-            f"{parsed_position}: {distance_from_origin(parsed_position)}"
-        )
-    print()
-
-    invalid_string = "abc,def,ghi"
-    print(f'Parsing invalid coordinates: "{invalid_string}"')
-    parse_coordinates(invalid_string)
-    print()
-
-    if parsed_position is not None:
-        print("Unpacking demonstration:")
-        x_value, y_value, z_value = parsed_position
-        print(f"Player at x={x_value}, y={y_value}, z={z_value}")
-        print(f"Coordinates: X={x_value}, Y={y_value}, Z={z_value}")
+    print("Get a second set of coordinates")
+    second_position = get_player_pos()
+    second_distance = round(
+        distance_between(first_position, second_position),
+        4,
+    )
+    print(
+        "Distance between the 2 sets of coordinates: "
+        f"{second_distance:.4f}"
+    )
 
 
 if __name__ == "__main__":

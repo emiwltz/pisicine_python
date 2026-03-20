@@ -4,8 +4,8 @@ import sys
 def main() -> None:
     print("=== Command Quest ===")
     if len(sys.argv) <= 1:
-        print("No arguments provided!")
         print(f"Program name: {sys.argv[0]}")
+        print("No arguments provided!")
         print(f"Total arguments: {len(sys.argv)}")
         return
 
