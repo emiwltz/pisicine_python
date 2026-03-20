@@ -10,6 +10,8 @@ def garden_operations(operation_number: int) -> None:
         open("/non/existent/file")
     elif operation_number == 3:
         "garden" + 1
+    else:
+        return
 
 
 def test_error_types() -> None:
