@@ -138,12 +138,18 @@ class EventStream(DataStream):
 
         except (TypeError, ValueError) as e:
             raise ValueError(
-                f"Transaction stream processing failed: {e}"
+                f"Event stream processing failed: {e}"
             ) from e
 
 
+class StreamProcessor:
+    def process_stream(self, stream: DataStream, data_batch: List[Any]) -> str:
+        if not isinstance(stream, DataStream):
+            return f" There is a problem with {stream}"
+        return (stream.process_batch(data_batch))
+
+
 def main():
-    print("test")
 
 
 if __name__ == "__main__":
