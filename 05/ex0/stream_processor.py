@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from typing import Any, List
 
@@ -27,8 +25,10 @@ class NumericProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         if not isinstance(data, list) or len(data) == 0:
             return False
-        return all(isinstance(value, (int, float)) and not isinstance(value, bool)
-                   for value in data)
+        return all(
+            isinstance(value, (int, float)) and not isinstance(value, bool)
+            for value in data
+        )
 
     def process(self, data: Any) -> str:
         if not self.validate(data):
@@ -62,10 +62,8 @@ class TextProcessor(DataProcessor):
             text = data.strip()
             char_count = len(text)
             word_count = len(text.split())
-            result = (
-                f"Processed text: {char_count} characters, "
-                f"{word_count} words"
-            )
+            result = f"Processed text: {char_count} characters, "
+            result += f"{word_count} words"
             return self.format_output(result)
         except (AttributeError, TypeError) as error:
             raise ValueError(f"Text processing failed: {error}") from error
@@ -94,8 +92,8 @@ class LogProcessor(DataProcessor):
             clean_message = message.strip()
 
             if clean_level == "ERROR":
-                result = f"[ALERT] {
-                    clean_level} level detected: {clean_message}"
+                result = f"[ALERT] {clean_level} "
+                result += f"level detected: {clean_message}"
             elif clean_level == "WARNING":
                 result = f"[WARNING] {clean_message}"
             elif clean_level == "INFO":
