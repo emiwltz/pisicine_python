@@ -65,35 +65,81 @@ class TransactionStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         try:
-            valid_entries = [
-                data for data in data_batch if isinstance(data, str) and ":" in data
-            ]
+            if not isinstance(data_batch, list):
+                raise TypeError("data_batch must be a list")
+
+            valid_entries = []
+            buy_actions = []
+            sell_actions = []
+
+            for entry in data_batch:
+                if not isinstance(entry, str) or ":" not in entry:
+                    continue
+
+                action_type, value = entry.split(":", 1)
+                action_type = action_type.strip().lower()
+                amount = float(value.strip())
+
+                if action_type == "buy":
+                    buy_actions.append(amount)
+                    valid_entries.append(entry)
+                elif action_type == "sell":
+                    sell_actions.append(amount)
+                    valid_entries.append(entry)
 
             self.batch_count += 1
             self.treated_elements += len(valid_entries)
 
-            buy_actions = []
-            sell_actions = []
-            for entrie in valid_entries:
-                action_type, value = entrie.split(":", 1)
-                if action_type == "buy":
-                    buy_actions.append(float(value))
-                elif action_type == "sell":
-                    sell_actions.append(float(value))
-                else:
-                    return f"{action_type} is not valid"
+            net_flow = sum(buy_actions) - sum(sell_actions)
+
+            if net_flow > 0:
+                flow_display = f"+{net_flow:.1f}"
+            else:
+                flow_display = f"{net_flow:.1f}"
+
             return (
-                f"{len(valid_entries)} operations,"
-                f"net flows: +{sum(buy_actions) - sum(sell_actions)} units"
+                f"{len(valid_entries)} operations processed, "
+                f"net flow: {flow_display} units"
             )
 
-        except (ValueError, TypeError) as e:
-            raise ValueError(f"Invalid action: {e}") from e
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"Transaction stream processing failed: {error}"
+            ) from error
 
 
 class EventStream(DataStream):
     def __init__(self, stream_id: str) -> None:
         super().__init__(stream_id, "event")
+
+    def process_batch(self, data_batch: List[Any]) -> str:
+        try:
+            if not isinstance(data_batch, list):
+                raise TypeError("data_batch must be a list")
+
+            valid_entries = []
+            error_entries = []
+
+            for entry in data_batch:
+                if not isinstance(entry, str):
+                    continue
+                valid_entries.append(entry)
+            for entry in valid_entries:
+                if entry == "error":
+                    error_entries.append(entry)
+
+            self.batch_count += 1
+            self.treated_elements += len(valid_entries)
+
+            return (
+                f"Event analysis: {len(valid_entries)} events, "
+                f"{len(error_entries)} error detected"
+            )
+
+        except (TypeError, ValueError) as e:
+            raise ValueError(
+                f"Transaction stream processing failed: {e}"
+            ) from e
 
 
 def main():

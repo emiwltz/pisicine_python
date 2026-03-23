@@ -1,38 +1,29 @@
-
-def open_file(file_to_open: str):
+def handle_archive_access(file_to_open: str) -> None:
     try:
-        with open(file_to_open) as file:
-            contenue = file.read()
-            print(f"ROUTINE ACCESS: Attempting access to '{file_to_open}'...")
-            print(f"SUCCESS: Archive recovered - ``{contenue}''")
-            print("STATUS: Normal operations resumed")
-            print()
+        with open(file_to_open, "r", encoding="utf-8") as file:
+            content = file.read()
+        print(f"ROUTINE ACCESS: Attempting access to '{file_to_open}'...")
+        print(f"SUCCESS: Archive recovered - ``{content}''")
+        print("STATUS: Normal operations resumed")
     except FileNotFoundError:
         print(f"CRISIS ALERT: Attempting access to '{file_to_open}'...")
         print("RESPONSE: Archive not found in storage matrix")
         print("STATUS: Crisis handled, system stable")
-        print()
     except PermissionError:
         print(f"CRISIS ALERT: Attempting access to '{file_to_open}'...")
         print("RESPONSE: Security protocols deny access")
         print("STATUS: Crisis handled, security maintained")
-        print()
     except Exception:
         print(f"CRISIS ALERT: Attempting access to '{file_to_open}'...")
-        print("Sommething happened")
+        print("RESPONSE: Unexpected system anomaly detected")
         print("STATUS: Crisis handled, system stable")
-        print()
 
 
-def main():
+def main() -> None:
     print("=== CYBER ARCHIVES - CRISIS RESPONSE SYSTEM ===")
-    print()
-    f1 = "lost_archive.txt"
-    f2 = "classified_vault.txt"
-    f3 = "standard_archive.txt"
-    open_file(f1)
-    open_file(f2)
-    open_file(f3)
+    handle_archive_access("lost_archive.txt")
+    handle_archive_access("classified_vault.txt")
+    handle_archive_access("standard_archive.txt")
     print("All crisis scenarios handled successfully. Archives secure.")
 
 

@@ -1,28 +1,19 @@
-def main():
-    f1 = "classified_data.txt"
-    f2 = "security_protocols.txt"
+def main() -> None:
+    extraction_file = "classified_data.txt"
+    preservation_file = "security_protocols.txt"
+
     print("=== CYBER ARCHIVES - VAULT SECURITY SYSTEM ===")
-    print()
     print("Initiating secure vault access...")
     print("Vault connection established with failsafe protocols")
-    print()
-    with open(f1, "r") as file:
-        contenu = file.read()
+    with open(extraction_file, "r", encoding="utf-8") as file:
         print("SECURE EXTRACTION:")
-        print(contenu)
-
-    print()
-
-    with open(f2, "w") as file:
+        print(file.read())
+    with open(preservation_file, "w", encoding="utf-8") as file:
         file.write("[CLASSIFIED] New security protocols archived")
-
-    with open(f2, "r") as file:
+    with open(preservation_file, "r", encoding="utf-8") as file:
         print("SECURE PRESERVATION:")
-        contenu = file.read()
-        print(contenu)
-
+        print(file.read())
     print("Vault automatically sealed upon completion")
-    print()
     print("All vault operations completed with maximum security.")
 
 
