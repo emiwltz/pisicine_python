@@ -1,5 +1,6 @@
 def main() -> None:
     file_to_create = "new_discovery.txt"
+    file = None
     entries = [
         "[ENTRY 001] New quantum algorithm discovered",
         "[ENTRY 002] Efficiency increased by 347%",
@@ -8,16 +9,24 @@ def main() -> None:
 
     print("=== CYBER ARCHIVES - PRESERVATION SYSTEM ===")
     print(f"Initializing new storage unit: {file_to_create}")
-    file = open(file_to_create, "w", encoding="utf-8")
-    print("Storage unit created successfully...")
-    print("Inscribing preservation data...")
-    for index, entry in enumerate(entries):
-        print(entry)
-        if index < len(entries) - 1:
-            file.write(f"{entry}\n")
-        else:
-            file.write(entry)
-    file.close()
+    try:
+        file = open(file_to_create, "w")
+        print("Storage unit created successfully...")
+        print("Inscribing preservation data...")
+        for entry in entries:
+            print(entry)
+        file.write(f"{entries[0]}\n")
+        file.write(f"{entries[1]}\n")
+        file.write(entries[2])
+    except PermissionError:
+        print("ERROR: Preservation access denied. Storage unit not sealed.")
+        return
+    except Exception as error:
+        print(f"ERROR: Archive operation failed gracefully: {error}")
+        return
+    finally:
+        if file is not None:
+            file.close()
     print("Data inscription complete. Storage unit sealed.")
     print(f"Archive '{file_to_create}' ready for long-term preservation.")
 

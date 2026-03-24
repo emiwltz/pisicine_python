@@ -1,6 +1,6 @@
 def handle_archive_access(file_to_open: str) -> None:
     try:
-        with open(file_to_open, "r", encoding="utf-8") as file:
+        with open(file_to_open, "r") as file:
             content = file.read()
         print(f"ROUTINE ACCESS: Attempting access to '{file_to_open}'...")
         print(f"SUCCESS: Archive recovered - ``{content}''")
