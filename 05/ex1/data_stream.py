@@ -137,19 +137,31 @@ class EventStream(DataStream):
             )
 
         except (TypeError, ValueError) as e:
-            raise ValueError(
-                f"Event stream processing failed: {e}"
-            ) from e
+            raise ValueError(f"Event stream processing failed: {e}") from e
 
 
 class StreamProcessor:
     def process_stream(self, stream: DataStream, data_batch: List[Any]) -> str:
         if not isinstance(stream, DataStream):
-            return f" There is a problem with {stream}"
-        return (stream.process_batch(data_batch))
+            raise TypeError("stream must be a DataStream")
+        return stream.process_batch(data_batch)
 
 
 def main():
+    sensor = SensorStream("sensor_00")
+    transaction = TransactionStream("transaction_00")
+    event = EventStream("event_00")
+
+    streams = [sensor, transaction, event]
+    stream_processor = StreamProcessor()
+
+    sensor_data = ["temp:22.5", "humidity:65", "pressure:1013"]
+    transaction_data = ["buy:100", "sell:150", "buy:75"]
+    event_data = ["login", "error", "logout"]
+    data_lists = [sensor_data, transaction_data, event_data]
+
+    for stream, data_list in zip(streams, data_lists):
+        print(stream_processor.process_stream(stream, data_list))
 
 
 if __name__ == "__main__":
