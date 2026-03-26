@@ -1,18 +1,20 @@
 from abc import ABC, abstractmethod
-from typing import Any, List
+from typing import Any, Dict, List, Optional, Union
+
+DisplayValue = Union[List[Any], str]
 
 
 class DataProcessor(ABC):
-    def __init__(self, processor_name: str) -> None:
-        self.processor_name = processor_name
+    def __init__(self) -> None:
+        super().__init__()
 
     @abstractmethod
     def process(self, data: Any) -> str:
-        """Process the data and return a formatted result string."""
+        """Process the data and return the result string."""
 
     @abstractmethod
     def validate(self, data: Any) -> bool:
-        """Validate whether the data is appropriate for this processor."""
+        """Validate whether the data fits the processor."""
 
     def format_output(self, result: str) -> str:
         return f"Output: {result}"
@@ -20,15 +22,19 @@ class DataProcessor(ABC):
 
 class NumericProcessor(DataProcessor):
     def __init__(self) -> None:
-        super().__init__("Numeric Processor")
+        super().__init__()
 
     def validate(self, data: Any) -> bool:
-        if not isinstance(data, list) or len(data) == 0:
+        try:
+            if len(data) == 0:
+                return False
+            for value in data:
+                if value is True or value is False:
+                    return False
+                float(value)
+        except (TypeError, ValueError):
             return False
-        return all(
-            isinstance(value, (int, float)) and not isinstance(value, bool)
-            for value in data
-        )
+        return True
 
     def process(self, data: Any) -> str:
         if not self.validate(data):
@@ -38,114 +44,140 @@ class NumericProcessor(DataProcessor):
             numbers: List[float] = [float(value) for value in data]
             total = sum(numbers)
             average = total / len(numbers)
-            result = (
+            return (
                 f"Processed {len(numbers)} numeric values, "
-                f"sum={total:g}, avg={average}"
+                f"sum={total:g}, avg={average:.1f}"
             )
-            return self.format_output(result)
         except (TypeError, ValueError) as error:
             raise ValueError(f"Numeric processing failed: {error}") from error
 
 
 class TextProcessor(DataProcessor):
     def __init__(self) -> None:
-        super().__init__("Text Processor")
+        super().__init__()
 
     def validate(self, data: Any) -> bool:
-        return isinstance(data, str) and data.strip() != ""
+        try:
+            return data.strip() != ""
+        except AttributeError:
+            return False
 
     def process(self, data: Any) -> str:
         if not self.validate(data):
             raise ValueError("Invalid text data")
 
-        try:
-            text = data.strip()
-            char_count = len(text)
-            word_count = len(text.split())
-            result = f"Processed text: {char_count} characters, "
-            result += f"{word_count} words"
-            return self.format_output(result)
-        except (AttributeError, TypeError) as error:
-            raise ValueError(f"Text processing failed: {error}") from error
+        text = data.strip()
+        char_count = len(text)
+        word_count = len(text.split())
+        return f"Processed text: {char_count} characters, {word_count} words"
 
 
 class LogProcessor(DataProcessor):
-    VALID_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR"}
+    VALID_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR"]
 
     def __init__(self) -> None:
-        super().__init__("Log Processor")
+        super().__init__()
 
     def validate(self, data: Any) -> bool:
-        if not isinstance(data, str) or ":" not in data:
-            return False
-
-        level, message = data.split(":", 1)
-        return level.strip() in self.VALID_LEVELS and message.strip() != ""
+        return self._extract_log_parts(data) is not None
 
     def process(self, data: Any) -> str:
-        if not self.validate(data):
+        log_parts = self._extract_log_parts(data)
+        if log_parts is None:
             raise ValueError("Invalid log data")
 
+        level = log_parts[0]
+        message = log_parts[1]
+        prefix = f"[{level}]"
+        if level == "ERROR":
+            prefix = "[ALERT]"
+        return f"{prefix} {level} level detected: {message}"
+
+    def _extract_log_parts(self, data: Any) -> Optional[List[str]]:
         try:
             level, message = data.split(":", 1)
-            clean_level = level.strip()
-            clean_message = message.strip()
+        except (AttributeError, ValueError):
+            return None
 
-            if clean_level == "ERROR":
-                result = f"[ALERT] {clean_level} "
-                result += f"level detected: {clean_message}"
-            elif clean_level == "WARNING":
-                result = f"[WARNING] {clean_message}"
-            elif clean_level == "INFO":
-                result = f"[INFO] {clean_message}"
-            else:
-                result = f"[DEBUG] {clean_message}"
-
-            return self.format_output(result)
-        except (AttributeError, ValueError) as error:
-            raise ValueError(f"Log processing failed: {error}") from error
+        clean_level = level.strip()
+        clean_message = message.strip()
+        if clean_level not in self.VALID_LEVELS:
+            return None
+        if clean_message == "":
+            return None
+        return [clean_level, clean_message]
 
 
-def run_processor(processor: DataProcessor, data: Any) -> None:
-    print(f"Initializing {processor.processor_name}...")
-    print(f"Processing data: {data!r}")
-
+def _format_display_value(data: DisplayValue) -> str:
     try:
-        if processor.validate(data):
-            print("Validation: Data verified")
-            print(processor.process(data))
-        else:
-            print("Validation: Invalid data")
+        return '"' + data + '"'
+    except TypeError:
+        return f"{data}"
+
+
+def _run_demo(
+    processor: DataProcessor,
+    data: DisplayValue,
+    settings: Dict[str, str],
+) -> None:
+    print(f"Initializing {settings['name']}...")
+    print(f"Processing data: {_format_display_value(data)}")
+    try:
+        result = processor.process(data)
+        print(f"Validation: {settings['validation']}")
+        print(processor.format_output(result))
     except ValueError as error:
         print(f"Error: {error}")
-
     print()
 
 
 def main() -> None:
     print("=== CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
 
-    numeric_processor = NumericProcessor()
-    text_processor = TextProcessor()
-    log_processor = LogProcessor()
-
-    run_processor(numeric_processor, [1, 2, 3, 4, 5])
-    run_processor(text_processor, "Hello Nexus World")
-    run_processor(log_processor, "ERROR: Connection timeout")
-
-    print("=== Polymorphic Processing Demo ===")
-
-    processors_and_data: list[tuple[DataProcessor, Any]] = [
-        (numeric_processor, [10, 20, 30]),
-        (text_processor, "Polymorphism is powerful"),
-        (log_processor, "WARNING: Disk space is low"),
+    processors: List[DataProcessor] = [
+        NumericProcessor(),
+        TextProcessor(),
+        LogProcessor(),
+    ]
+    examples: List[DisplayValue] = [
+        [1, 2, 3, 4, 5],
+        "Hello Nexus World",
+        "ERROR: Connection timeout",
+    ]
+    settings: List[Dict[str, str]] = [
+        {
+            "name": "Numeric Processor",
+            "validation": "Numeric data verified",
+        },
+        {
+            "name": "Text Processor",
+            "validation": "Text data verified",
+        },
+        {
+            "name": "Log Processor",
+            "validation": "Log entry verified",
+        },
     ]
 
-    for processor, data in processors_and_data:
-        try:
-            print(f"{processor.processor_name}: {processor.process(data)}")
-        except ValueError as error:
-            print(f"{processor.processor_name}: Error - {error}")
+    index = 0
+    while index < len(processors):
+        _run_demo(processors[index], examples[index], settings[index])
+        index += 1
+
+    print("=== Polymorphic Processing Demo ===")
+    print("Processing multiple data types through same interface...")
+
+    demo_data: List[DisplayValue] = [
+        [1, 2, 3],
+        "Hello Matrix",
+        "INFO: System ready",
+    ]
+
+    for index, processor in enumerate(processors, start=1):
+        result = processor.process(demo_data[index - 1])
+        print(f"Result {index}: {result}")
+
+    print("Foundation systems online. Nexus ready for advanced streams.")
 
 
 if __name__ == "__main__":
