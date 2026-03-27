@@ -1,5 +1,10 @@
 import alchemy
-from alchemy.transmutation import lead_to_gold, stone_to_gem, philosophers_stone, elixir_of_life
+from alchemy.transmutation import (
+    lead_to_gold,
+    stone_to_gem,
+    philosophers_stone,
+    elixir_of_life,
+)
 
 
 def main():
@@ -17,10 +22,12 @@ def main():
     print()
 
     print("Testing Package Access:")
-    print(f"alchemy.transmutation.lead_to_gold(): {
-          alchemy.transmutation.lead_to_gold()}")
-    print(f"alchemy.transmutation.philosophers_stone(): {
-          alchemy.transmutation.philosophers_stone()}")
+    print(
+        f"alchemy.transmutation.lead_to_gold(): {alchemy.transmutation.lead_to_gold()}"
+    )
+    print(
+        f"alchemy.transmutation.philosophers_stone(): {alchemy.transmutation.philosophers_stone()}"
+    )
     print()
 
     print("Both pathways work! Absolute: clear, Relative: concise")
