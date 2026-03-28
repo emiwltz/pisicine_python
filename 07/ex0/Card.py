@@ -7,7 +7,7 @@ class Card(ABC):
             self.name = name
         else:
             raise ValueError("Name cannot be empty")
-        if isinstance(cost, int) and cost > 0:
+        if isinstance(cost, int) and cost >= 0:
             self.cost = cost
         else:
             raise ValueError("Cost must be a positive int")
