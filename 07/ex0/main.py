@@ -14,7 +14,7 @@ def main():
     print(fire_dragon.get_card_info())
     print()
 
-    game_state = {}
+    game_state = {"mana": 7}
     print("Playing Fire Dragon with 6 mana available:")
     print(f"Playable: {fire_dragon.is_playable(6)}")
     print(f"Play result: {fire_dragon.play(game_state)}")
