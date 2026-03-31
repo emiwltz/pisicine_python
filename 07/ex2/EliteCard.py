@@ -70,7 +70,17 @@ class EliteCard(Card, Combatable, Magical):
         raise ValueError(f"{self.name} must be activated and alive before")
 
     def cast_spell(self, spell_name: str, targets: list) -> dict:
-        pass
+        if self.spell_mana < 4:
+            raise ValueError("Card have not enough mana")
+        if self.is_active and self.health > 0:
+            self.spell_mana -= 4
+            return {
+                "caster": self.name,
+                "spell": spell_name,
+                "targets": targets,
+                "mana_used": 4
+            }
+        raise ValueError(f"{self.name} must be activated and alive before")
 
     def channel_mana(self, amount: int) -> dict:
         if not isinstance(amount, int) or amount < 0:
@@ -82,7 +92,11 @@ class EliteCard(Card, Combatable, Magical):
         raise ValueError(f"{self.name} must be activated and alive before")
 
     def get_magic_stats(self) -> dict:
-        pass
+        return {
+            "name": self.name,
+            "spell_mana": self.spell_mana,
+            "is_active": self.is_active,
+        }
 
     def defend(self, incoming_damage: int) -> dict:
         if not isinstance(incoming_damage, int) or incoming_damage <= 0:
@@ -105,4 +119,10 @@ class EliteCard(Card, Combatable, Magical):
         raise ValueError(f"{self.name} must be activated and alive before")
 
     def get_combat_stats(self) -> dict:
-        pass
+        return {
+            "name": self.name,
+            "health": self.health,
+            "attack_power": self.attack_power,
+            "defense_power": self.defense_power,
+            "is_active": self.is_active,
+        }
