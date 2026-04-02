@@ -1,5 +1,6 @@
-__version__ = "1.0.0"
-__author__ = "Master Pythonicus"
+from . import transmutation
+from .elements import create_air
+from .potions import healing_potion as heal
+from .potions import strength_potion
 
-
-from .elements import create_fire, create_water
+__all__ = ["create_air", "heal", "strength_potion", "transmutation"]

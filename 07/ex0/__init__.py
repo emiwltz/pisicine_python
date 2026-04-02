@@ -1,2 +1,4 @@
-from ex0.Card import Card
-from ex0.CreatureCard import CreatureCard
+from ex0.AquaFactory import AquaFactory
+from ex0.FlameFactory import FlameFactory
+
+__all__ = ["AquaFactory", "FlameFactory"]
