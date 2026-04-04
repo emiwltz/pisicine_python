@@ -31,10 +31,7 @@ def summarize_opponents(opponents: list[Opponent]) -> str:
     summary_parts = []
 
     for factory, strategy in opponents:
-        part = (
-            f"({get_factory_label(factory)}+"
-            f"{get_strategy_label(strategy)})"
-        )
+        part = f"({get_factory_label(factory)}+{get_strategy_label(strategy)})"
         summary_parts.append(part)
 
     return f"[ {', '.join(summary_parts)} ]"
@@ -94,7 +91,9 @@ def main() -> None:
     ]
 
     run_tournament("Tournament 0 (basic)", tournament_zero)
+    print()
     run_tournament("Tournament 1 (error)", tournament_one)
+    print()
     run_tournament("Tournament 2 (multiple)", tournament_two)
 
 

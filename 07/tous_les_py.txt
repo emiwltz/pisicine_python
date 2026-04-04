@@ -1,0 +1,569 @@
+==============================
+FICHIER : ./ex0/AquaFactory.py
+==============================
+from ex0.Creature import Creature
+from ex0.CreatureFactory import CreatureFactory
+
+
+class Aquabub(Creature):
+    def __init__(self) -> None:
+        super().__init__("Aquabub", "Water")
+
+    def attack(self) -> str:
+        return f"{self.name} uses Water Gun!"
+
+
+class Torragon(Creature):
+    def __init__(self) -> None:
+        super().__init__("Torragon", "Water")
+
+    def attack(self) -> str:
+        return f"{self.name} uses Hydro Pump!"
+
+
+class AquaFactory(CreatureFactory):
+    def create_base(self) -> Creature:
+        return Aquabub()
+
+    def create_evolved(self) -> Creature:
+        return Torragon()
+
+
+==============================
+FICHIER : ./ex0/Creature.py
+==============================
+from abc import ABC, abstractmethod
+
+
+class Creature(ABC):
+    def __init__(self, name: str, creature_type: str) -> None:
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("Creature name must be a non-empty string")
+        if not isinstance(creature_type, str) or not creature_type.strip():
+            raise ValueError("Creature type must be a non-empty string")
+        self.name = name
+        self.creature_type = creature_type
+
+    def describe(self) -> str:
+        return f"{self.name} is a {self.creature_type} type Creature"
+
+    @abstractmethod
+    def attack(self) -> str:
+        """Return the Creature attack message."""
+
+
+==============================
+FICHIER : ./ex0/CreatureFactory.py
+==============================
+from abc import ABC, abstractmethod
+
+from ex0.Creature import Creature
+
+
+class CreatureFactory(ABC):
+    @abstractmethod
+    def create_base(self) -> Creature:
+        """Create the base Creature for a family."""
+
+    @abstractmethod
+    def create_evolved(self) -> Creature:
+        """Create the evolved Creature for a family."""
+
+
+==============================
+FICHIER : ./ex0/FlameFactory.py
+==============================
+from ex0.Creature import Creature
+from ex0.CreatureFactory import CreatureFactory
+
+
+class Flameling(Creature):
+    def __init__(self) -> None:
+        super().__init__("Flameling", "Fire")
+
+    def attack(self) -> str:
+        return f"{self.name} uses Ember!"
+
+
+class Pyrodon(Creature):
+    def __init__(self) -> None:
+        super().__init__("Pyrodon", "Fire/Flying")
+
+    def attack(self) -> str:
+        return f"{self.name} uses Flamethrower!"
+
+
+class FlameFactory(CreatureFactory):
+    def create_base(self) -> Creature:
+        return Flameling()
+
+    def create_evolved(self) -> Creature:
+        return Pyrodon()
+
+
+==============================
+FICHIER : ./ex0/__init__.py
+==============================
+from ex0.AquaFactory import AquaFactory
+from ex0.FlameFactory import FlameFactory
+
+__all__ = ["AquaFactory", "FlameFactory"]
+
+
+==============================
+FICHIER : ./ex1/HealCapability.py
+==============================
+from abc import ABC, abstractmethod
+
+
+class HealCapability(ABC):
+    @abstractmethod
+    def heal(self, target: str | None = None) -> str:
+        """Return the healing action message."""
+
+
+==============================
+FICHIER : ./ex1/HealingCreatureFactory.py
+==============================
+from ex0.Creature import Creature
+from ex0.CreatureFactory import CreatureFactory
+from ex1.HealCapability import HealCapability
+
+
+class Sproutling(Creature, HealCapability):
+    def __init__(self) -> None:
+        super().__init__("Sproutling", "Grass")
+
+    def attack(self) -> str:
+        return f"{self.name} uses Vine Whip!"
+
+    def heal(self, target: str | None = None) -> str:
+        return f"{self.name} heals itself for a small amount"
+
+
+class Bloomelle(Creature, HealCapability):
+    def __init__(self) -> None:
+        super().__init__("Bloomelle", "Grass/Fairy")
+
+    def attack(self) -> str:
+        return f"{self.name} uses Petal Dance!"
+
+    def heal(self, target: str | None = None) -> str:
+        return f"{self.name} heals itself and others for a large amount"
+
+
+class HealingCreatureFactory(CreatureFactory):
+    def create_base(self) -> Creature:
+        return Sproutling()
+
+    def create_evolved(self) -> Creature:
+        return Bloomelle()
+
+
+==============================
+FICHIER : ./ex1/TransformCapability.py
+==============================
+from abc import ABC, abstractmethod
+
+
+class TransformCapability(ABC):
+    @abstractmethod
+    def transform(self) -> str:
+        """Switch the Creature to its transformed state."""
+
+    @abstractmethod
+    def revert(self) -> str:
+        """Return the Creature to its normal state."""
+
+
+==============================
+FICHIER : ./ex1/TransformCreatureFactory.py
+==============================
+from ex0.Creature import Creature
+from ex0.CreatureFactory import CreatureFactory
+from ex1.TransformCapability import TransformCapability
+
+
+class Shiftling(Creature, TransformCapability):
+    def __init__(self) -> None:
+        super().__init__("Shiftling", "Normal")
+        self._is_transformed = False
+
+    def attack(self) -> str:
+        if self._is_transformed:
+            return f"{self.name} performs a boosted strike!"
+        return f"{self.name} attacks normally."
+
+    def transform(self) -> str:
+        self._is_transformed = True
+        return f"{self.name} shifts into a sharper form!"
+
+    def revert(self) -> str:
+        self._is_transformed = False
+        return f"{self.name} returns to normal."
+
+
+class Morphagon(Creature, TransformCapability):
+    def __init__(self) -> None:
+        super().__init__("Morphagon", "Normal/Dragon")
+        self._is_transformed = False
+
+    def attack(self) -> str:
+        if self._is_transformed:
+            return f"{self.name} unleashes a devastating morph strike!"
+        return f"{self.name} attacks normally."
+
+    def transform(self) -> str:
+        self._is_transformed = True
+        return f"{self.name} morphs into a dragonic battle form!"
+
+    def revert(self) -> str:
+        self._is_transformed = False
+        return f"{self.name} stabilizes its form."
+
+
+class TransformCreatureFactory(CreatureFactory):
+    def create_base(self) -> Creature:
+        return Shiftling()
+
+    def create_evolved(self) -> Creature:
+        return Morphagon()
+
+
+==============================
+FICHIER : ./ex1/__init__.py
+==============================
+from ex1.HealingCreatureFactory import HealingCreatureFactory
+from ex1.TransformCreatureFactory import TransformCreatureFactory
+
+__all__ = ["HealingCreatureFactory", "TransformCreatureFactory"]
+
+
+==============================
+FICHIER : ./ex2/AggressiveStrategy.py
+==============================
+from typing import cast
+
+from ex0.Creature import Creature
+from ex1.TransformCapability import TransformCapability
+from ex2.BattleStrategy import BattleStrategy
+
+
+class AggressiveStrategy(BattleStrategy):
+    error_label = "aggressive"
+
+    def is_valid(self, creature: Creature) -> bool:
+        return isinstance(creature, TransformCapability)
+
+    def act(self, creature: Creature) -> list[str]:
+        if not self.is_valid(creature):
+            self._raise_invalid(creature)
+
+        transformer = cast(TransformCapability, creature)
+        return [transformer.transform(), creature.attack(), transformer.revert()]
+
+
+==============================
+FICHIER : ./ex2/BattleStrategy.py
+==============================
+from abc import ABC, abstractmethod
+
+from ex0.Creature import Creature
+from ex2.exceptions import InvalidStrategyError
+
+
+class BattleStrategy(ABC):
+    error_label: str = "battle"
+
+    @abstractmethod
+    def is_valid(self, creature: Creature) -> bool:
+        """Return whether the strategy can be applied to this Creature."""
+
+    @abstractmethod
+    def act(self, creature: Creature) -> list[str]:
+        """Return the ordered list of actions performed by the Creature."""
+
+    def _raise_invalid(self, creature: Creature) -> None:
+        raise InvalidStrategyError(
+            f"Invalid Creature '{creature.name}' for this "
+            f"{self.error_label} strategy"
+        )
+
+
+==============================
+FICHIER : ./ex2/DefensiveStrategy.py
+==============================
+from typing import cast
+
+from ex0.Creature import Creature
+from ex1.HealCapability import HealCapability
+from ex2.BattleStrategy import BattleStrategy
+
+
+class DefensiveStrategy(BattleStrategy):
+    error_label = "defensive"
+
+    def is_valid(self, creature: Creature) -> bool:
+        return isinstance(creature, HealCapability)
+
+    def act(self, creature: Creature) -> list[str]:
+        if not self.is_valid(creature):
+            self._raise_invalid(creature)
+
+        healer = cast(HealCapability, creature)
+        return [creature.attack(), healer.heal()]
+
+
+==============================
+FICHIER : ./ex2/NormalStrategy.py
+==============================
+from ex0.Creature import Creature
+from ex2.BattleStrategy import BattleStrategy
+
+
+class NormalStrategy(BattleStrategy):
+    error_label = "normal"
+
+    def is_valid(self, creature: Creature) -> bool:
+        return isinstance(creature, Creature)
+
+    def act(self, creature: Creature) -> list[str]:
+        if not self.is_valid(creature):
+            self._raise_invalid(creature)
+        return [creature.attack()]
+
+
+==============================
+FICHIER : ./ex2/__init__.py
+==============================
+from ex2.AggressiveStrategy import AggressiveStrategy
+from ex2.DefensiveStrategy import DefensiveStrategy
+from ex2.NormalStrategy import NormalStrategy
+from ex2.exceptions import InvalidStrategyError
+
+__all__ = [
+    "AggressiveStrategy",
+    "DefensiveStrategy",
+    "InvalidStrategyError",
+    "NormalStrategy",
+]
+
+
+==============================
+FICHIER : ./ex2/exceptions.py
+==============================
+class InvalidStrategyError(Exception):
+    """Raised when a Creature is used with an incompatible strategy."""
+
+
+==============================
+FICHIER : ./__init__.py
+==============================
+
+
+==============================
+FICHIER : ./battle.py
+==============================
+from ex0 import AquaFactory, FlameFactory
+from ex0.CreatureFactory import CreatureFactory
+
+
+def test_factory(factory: CreatureFactory) -> None:
+    print("Testing factory")
+    base_creature = factory.create_base()
+    evolved_creature = factory.create_evolved()
+    print(base_creature.describe())
+    print(base_creature.attack())
+    print(evolved_creature.describe())
+    print(evolved_creature.attack())
+
+
+def test_battle(
+    first_factory: CreatureFactory,
+    second_factory: CreatureFactory,
+) -> None:
+    first_creature = first_factory.create_base()
+    second_creature = second_factory.create_base()
+    print("Testing battle")
+    print(first_creature.describe())
+    print("vs.")
+    print(second_creature.describe())
+    print("fight!")
+    print(first_creature.attack())
+    print(second_creature.attack())
+
+
+def main() -> None:
+    flame_factory = FlameFactory()
+    aqua_factory = AquaFactory()
+
+    test_factory(flame_factory)
+    test_factory(aqua_factory)
+    test_battle(flame_factory, aqua_factory)
+
+
+if __name__ == "__main__":
+    main()
+
+
+==============================
+FICHIER : ./capacitor.py
+==============================
+from typing import cast
+
+from ex0.Creature import Creature
+from ex0.CreatureFactory import CreatureFactory
+from ex1 import HealingCreatureFactory, TransformCreatureFactory
+from ex1.HealCapability import HealCapability
+from ex1.TransformCapability import TransformCapability
+
+
+def test_healing_creature(label: str, creature: Creature) -> None:
+    print(label)
+    print(creature.describe())
+    print(creature.attack())
+    print(cast(HealCapability, creature).heal())
+
+
+def test_transforming_creature(label: str, creature: Creature) -> None:
+    print(label)
+    print(creature.describe())
+    print(creature.attack())
+
+    transformer = cast(TransformCapability, creature)
+    print(transformer.transform())
+    print(creature.attack())
+    print(transformer.revert())
+
+
+def test_healing_factory(factory: CreatureFactory) -> None:
+    print("Testing Creature with healing capability")
+    test_healing_creature("base:", factory.create_base())
+    test_healing_creature("evolved:", factory.create_evolved())
+
+
+def test_transform_factory(factory: CreatureFactory) -> None:
+    print("Testing Creature with transform capability")
+    test_transforming_creature("base:", factory.create_base())
+    test_transforming_creature("evolved:", factory.create_evolved())
+
+
+def main() -> None:
+    healing_factory = HealingCreatureFactory()
+    transform_factory = TransformCreatureFactory()
+
+    test_healing_factory(healing_factory)
+    test_transform_factory(transform_factory)
+
+
+if __name__ == "__main__":
+    main()
+
+
+==============================
+FICHIER : ./tournament.py
+==============================
+from ex0 import AquaFactory, FlameFactory
+from ex0.CreatureFactory import CreatureFactory
+from ex1 import HealingCreatureFactory, TransformCreatureFactory
+from ex2 import (
+    AggressiveStrategy,
+    DefensiveStrategy,
+    InvalidStrategyError,
+    NormalStrategy,
+)
+from ex2.BattleStrategy import BattleStrategy
+
+Opponent = tuple[CreatureFactory, BattleStrategy]
+
+
+def get_factory_label(factory: CreatureFactory) -> str:
+    labels = {
+        "AquaFactory": "Aquabub",
+        "FlameFactory": "Flameling",
+        "HealingCreatureFactory": "Healing",
+        "TransformCreatureFactory": "Transform",
+    }
+    return labels.get(factory.__class__.__name__, factory.__class__.__name__)
+
+
+def get_strategy_label(strategy: BattleStrategy) -> str:
+    name = strategy.__class__.__name__
+    return name.removesuffix("Strategy")
+
+
+def summarize_opponents(opponents: list[Opponent]) -> str:
+    summary_parts = []
+
+    for factory, strategy in opponents:
+        part = (
+            f"({get_factory_label(factory)}+"
+            f"{get_strategy_label(strategy)})"
+        )
+        summary_parts.append(part)
+
+    return f"[ {', '.join(summary_parts)} ]"
+
+
+def battle(opponents: list[Opponent]) -> None:
+    print("*** Tournament ***")
+    print(f"{len(opponents)} opponents involved")
+
+    for index, (first_factory, first_strategy) in enumerate(opponents):
+        for second_factory, second_strategy in opponents[index + 1:]:
+            first_creature = first_factory.create_base()
+            second_creature = second_factory.create_base()
+
+            print("* Battle *")
+            print(first_creature.describe())
+            print("vs.")
+            print(second_creature.describe())
+            print("now fight!")
+
+            try:
+                first_actions = first_strategy.act(first_creature)
+                second_actions = second_strategy.act(second_creature)
+            except InvalidStrategyError as error:
+                print(f"Battle error, aborting tournament: {error}")
+                return
+
+            for action in first_actions:
+                print(action)
+            for action in second_actions:
+                print(action)
+
+
+def run_tournament(title: str, opponents: list[Opponent]) -> None:
+    print(title)
+    print(summarize_opponents(opponents))
+    battle(opponents)
+
+
+def main() -> None:
+    normal_strategy = NormalStrategy()
+    aggressive_strategy = AggressiveStrategy()
+    defensive_strategy = DefensiveStrategy()
+
+    tournament_zero = [
+        (FlameFactory(), normal_strategy),
+        (HealingCreatureFactory(), defensive_strategy),
+    ]
+    tournament_one = [
+        (FlameFactory(), aggressive_strategy),
+        (HealingCreatureFactory(), defensive_strategy),
+    ]
+    tournament_two = [
+        (AquaFactory(), normal_strategy),
+        (HealingCreatureFactory(), defensive_strategy),
+        (TransformCreatureFactory(), aggressive_strategy),
+    ]
+
+    run_tournament("Tournament 0 (basic)", tournament_zero)
+    run_tournament("Tournament 1 (error)", tournament_one)
+    run_tournament("Tournament 2 (multiple)", tournament_two)
+
+
+if __name__ == "__main__":
+    main()
+
+
