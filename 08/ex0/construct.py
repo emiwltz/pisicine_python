@@ -1,15 +1,26 @@
+import os
 import sys
 import site
 
 
-def main():
+def get_package_path(prefix: str) -> str:
+    paths = site.getsitepackages([prefix])
+    if not paths:
+        return "Unavailable"
+    return paths[0]
+
+
+def main() -> None:
     print()
+    global_path = get_package_path(sys.base_prefix)
     if sys.prefix == sys.base_prefix:
         print("MATRIX STATUS: You're still plugged in")
         print()
         print(f"Current Python: {sys.executable}")
-        print(f"Current Python: {sys.prefix}")
+        print(f"Global Environment: {sys.prefix}")
         print("Virtual Environment: None detected")
+        print("Global package installation path:")
+        print(global_path)
         print()
         print("WARNING: You're in the global environment!")
         print("The machines can see everything you install.")
@@ -27,17 +38,16 @@ def main():
         print("MATRIX STATUS: Welcome to the construct")
         print()
         print(f"Current Python: {sys.executable}")
-        env_name = sys.prefix.rsplit("/", 1)
-        print(f"Virtual Environment: {env_name[1]}")
+        print(f"Virtual Environment: {os.path.basename(sys.prefix)}")
         print(f"Environment Path: {sys.prefix}")
         print()
         print("SUCCESS: You're in an isolated environment!")
-        print("Safe to install packages without affecting the global system")
+        print("Safe to install packages without affecting the global system.")
         print()
-        paths = site.getsitepackages()
-        install_path = paths[0]
-        print("Package installation path:")
-        print(install_path)
+        print("Global package installation path:")
+        print(global_path)
+        print("Virtual environment package installation path:")
+        print(get_package_path(sys.prefix))
 
 
 if __name__ == "__main__":
