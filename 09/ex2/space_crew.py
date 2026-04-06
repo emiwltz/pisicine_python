@@ -25,7 +25,7 @@ class SpaceMission(BaseModel):
     mission_id: str = Field(min_length=5, max_length=15)
     mission_name: str = Field(min_length=3, max_length=100)
     destination: str = Field(min_length=3, max_length=50)
-    launch_date: str
+    launch_date: datetime
     duration_days: int = Field(ge=1, le=3650)
     crew: list[CrewMember]
     mission_status: str = "planned"
@@ -108,9 +108,32 @@ def main():
         years_experience=6,
         is_active=True,
     )
-    print(sarah)
-    print(john)
-    print(alice)
+    crew = [alice, john, sarah]
+
+    mission = SpaceMission(
+        mission_id="M2024_MARS",
+        mission_name="Mars Colony Establishment",
+        destination="Mars",
+        launch_date="2026-04-06",
+        duration_days=350,
+        crew=crew,
+        budget_millions=3000,
+    )
+    print("Space Mission Crew Validation")
+    print("=========================================")
+    print("Valid mission created:")
+    print(f"Mission: {mission.mission_name}")
+    print(f"ID: {mission.mission_id}")
+    print(f"Destination: {mission.destination}")
+    print(f"Duration: {mission.duration_days} days")
+    print(f"Budget: ${mission.budget_millions}M")
+    print(f"Crew size: {len(mission.crew)}")
+    print("Crew members:")
+    for member in mission.crew:
+        print(
+            f"- {member.name} ({member.rank.value}) - {member.specialization}"
+        )
+    print("=========================================")
 
 
 if __name__ == "__main__":
