@@ -4,11 +4,11 @@
 def input_temperature(temp_str: str) -> int:
     temperature = int(temp_str)
     if temperature < 0:
-        raise ValueError(
+        raise ValidationError(
             f"{temperature}°C is too cold for plants (min 0°C)"
         )
     if temperature > 40:
-        raise ValueError(
+        raise ValidationError(
             f"{temperature}°C is too hot for plants (max 40°C)"
         )
     return temperature

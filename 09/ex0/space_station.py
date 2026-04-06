@@ -14,35 +14,43 @@ class SpaceStation(BaseModel):
 
 
 def main():
-    print("Testing with valid station")
+    print("Space Station Data Validation")
+    print("=" * 40)
+    print("Valid station created:")
     station1 = SpaceStation(
-        station_id="M_3421",
-        name="artemis",
-        crew_size=2,
-        power_level=20,
-        oxygen_level=10,
+        station_id="ISS999",
+        name="ISS",
+        crew_size=5,
+        power_level=50,
+        oxygen_level=91.3,
         last_maintenance="2026-04-05T12:00:00",
         is_operational=True,
-        notes="salut"
+        notes="Primary orbital research station.",
     )
-    print(station1)
-    print()
-
-    print("Trying invalid station")
+    print(f"ID: {station1.station_id}")
+    print(f"Name: {station1.name}")
+    print(f"Crew: {station1.crew_size} people")
+    print(f"Power: {station1.power_level}%")
+    print(f"Oxygen: {station1.oxygen_level}%")
+    print(
+        "Status: "
+        f"{'Operational' if station1.is_operational else 'Non-operational'}"
+    )
+    print("=" * 40)
+    print("Expected validation error:")
     try:
-        station2 = SpaceStation(
-            station_id="M",
-            name="artemis",
-            crew_size=2,
+        SpaceStation(
+            station_id="ISS002",
+            name="Lunar Gateway",
+            crew_size=21,
             power_level=20,
             oxygen_level=10,
             last_maintenance="2026-04-05T12:00:00",
             is_operational=True,
-            notes="salut"
+            notes="Crew capacity test.",
         )
-        print(station2)
-    except ValidationError as e:
-        print(e)
+    except ValidationError as exc:
+        print(exc.errors()[0]["msg"])
 
 
 if __name__ == "__main__":

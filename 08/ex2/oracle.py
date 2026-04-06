@@ -1,8 +1,12 @@
-from dotenv import load_dotenv
 import os
 
 
 def main():
+    try:
+        from dotenv import load_dotenv
+    except ModuleNotFoundError as e:
+        print(e)
+        return
     print()
     print("ORACLE STATUS: Reading the Matrix...")
     print()
