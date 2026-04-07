@@ -1,11 +1,6 @@
+from pydantic import BaseModel, Field, ValidationError, model_validator
 from datetime import datetime
 from enum import Enum
-from pydantic import (  # type: ignore[import-not-found]
-    BaseModel,
-    Field,
-    ValidationError,
-    model_validator,
-)
 
 
 class ContactType(Enum):
@@ -27,51 +22,45 @@ class AlienContact(BaseModel):
     is_verified: bool = False
 
     @model_validator(mode="after")
-    def check_id(self) -> "AlienContact":
+    def check_id(self):
         if not self.contact_id.startswith("AC"):
             raise ValueError("Contact ID must start with 'AC'")
         return self
 
     @model_validator(mode="after")
-    def check_physical(self) -> "AlienContact":
+    def check_physical(self):
         if self.contact_type is ContactType.PHYSICAL and not self.is_verified:
             raise ValueError("Physical contact reports must be verified")
         return self
 
     @model_validator(mode="after")
-    def check_telepathic(self) -> "AlienContact":
-        if (
-            self.contact_type is ContactType.TELEPATHIC
-            and self.witness_count < 3
-        ):
-            raise ValueError(
-                "Telepathic contact requires at least 3 witnesses"
-            )
+    def check_telepathic(self):
+        if self.contact_type is ContactType.TELEPATHIC and self.witness_count < 3:
+            raise ValueError("Telepathic contact requires at least 3 witnesses")
         return self
 
     @model_validator(mode="after")
-    def check_strong_signals(self) -> "AlienContact":
+    def check_strong_signals(self):
         if self.signal_strength > 7 and not self.message_received:
             raise ValueError(
-                "Strong signals (> 7.0) should include "
-                "received messages"
+                "Strong signals (> 7.0) should include received messages"
             )
         return self
 
 
-def main() -> None:
+def main():
     print("Alien Contact Log Validation")
     print("=" * 38)
     print("Valid contact report:")
     first_contact = AlienContact(
-        contact_id="AC_2026_117",
-        timestamp="2026-02-14T22:40:00",
-        location="Atacama Array, Chile",
+        contact_id="AC_2024_001",
+        timestamp="2026-04-06T10:00:00",
+        location="Area 51, Nevada",
         contact_type="radio",
-        signal_strength=9.1,
-        duration_minutes=32,
-        witness_count=4,
-        message_received="We observe your maps of the southern sky",
+        signal_strength=8.5,
+        duration_minutes=45,
+        witness_count=5,
+        message_received="Greetings from Zeta Reticuli",
         is_verified=True,
     )
     print(f"ID: {first_contact.contact_id}")
@@ -85,14 +74,14 @@ def main() -> None:
     print("Expected validation error:")
     try:
         AlienContact(
-            contact_id="AC_2026_118",
-            timestamp="2026-02-15T01:05:00",
-            location="Corsica Deep Range",
+            contact_id="AC_2024_002",
+            timestamp="2026-04-06T11:00:00",
+            location="Roswell, New Mexico",
             contact_type="telepathic",
-            signal_strength=5.8,
-            duration_minutes=17,
+            signal_strength=6.2,
+            duration_minutes=20,
             witness_count=2,
-            message_received="The gate is almost aligned",
+            message_received="We come in peace",
             is_verified=False,
         )
     except ValidationError as exc:

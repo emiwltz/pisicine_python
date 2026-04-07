@@ -1,13 +1,18 @@
-from pydantic import BaseModel, Field, model_validator
 from datetime import datetime
 from enum import Enum
+from pydantic import (  # type: ignore[import-not-found]
+    BaseModel,
+    Field,
+    ValidationError,
+    model_validator,
+)
 
 
 class Rank(Enum):
     CADET = "cadet"
     OFFICER = "officer"
     LIEUTENANT = "lieutenant"
-    CAPITAIN = "capitain"
+    CAPTAIN = "captain"
     COMMANDER = "commander"
 
 
@@ -27,97 +32,86 @@ class SpaceMission(BaseModel):
     destination: str = Field(min_length=3, max_length=50)
     launch_date: datetime
     duration_days: int = Field(ge=1, le=3650)
-    crew: list[CrewMember]
+    crew: list[CrewMember] = Field(min_length=1, max_length=12)
     mission_status: str = "planned"
     budget_millions: float = Field(ge=1.0, le=10000.0)
 
     @model_validator(mode="after")
-    def check_mission_id(self):
+    def check_mission_id(self) -> "SpaceMission":
         if not self.mission_id.startswith("M"):
             raise ValueError("Mission ID must start with 'M'")
         return self
 
     @model_validator(mode="after")
-    def check_rank(self):
-        rank_nbr = 0
-        for member in self.crew:
-            if member.rank is Rank.CAPITAIN or member.rank is Rank.COMMANDER:
-                rank_nbr += 1
-        if rank_nbr < 1:
+    def check_rank(self) -> "SpaceMission":
+        has_command = any(
+            member.rank in {Rank.CAPTAIN, Rank.COMMANDER}
+            for member in self.crew
+        )
+        if not has_command:
             raise ValueError("Must have at least one Commander or Captain")
         return self
 
     @model_validator(mode="after")
-    def check_experience(self):
-        rank_nbr = 0
-        for member in self.crew:
-            if member.rank is Rank.CAPITAIN or member.rank is Rank.COMMANDER:
-                rank_nbr += 1
-        if rank_nbr < 1:
-            raise ValueError("Must have at least one Commander or Captain")
-        return self
-
-    @model_validator(mode="after")
-    def check_long_mission(self):
+    def check_long_mission(self) -> "SpaceMission":
         if self.duration_days > 365:
-            experience_percentage = 0
-            experience_member = 0
-            for member in self.crew:
-                if member.years_experience >= 5:
-                    experience_member += 1
-            experience_percentage = experience_member / len(self.crew) * 100
-            if experience_percentage <= 50:
+            experienced_members = sum(
+                member.years_experience >= 5 for member in self.crew
+            )
+            experience_ratio = experienced_members / len(self.crew)
+            if experience_ratio < 0.5:
                 raise ValueError(
-                    "Long missions (> 365 days) need 50% experienced crew (5+ years)"
+                    "Long missions (> 365 days) need 50% "
+                    "experienced crew (5+ years)"
                 )
         return self
 
     @model_validator(mode="after")
-    def check_active(self):
+    def check_active(self) -> "SpaceMission":
         for member in self.crew:
             if not member.is_active:
                 raise ValueError("All crew members must be active")
         return self
 
 
-def main():
+def main() -> None:
     sarah = CrewMember(
-        member_id="CM001",
-        name="Sarah Connor",
+        member_id="CM101",
+        name="Elena Voss",
         rank=Rank.COMMANDER,
-        age=42,
-        specialization="Command",
-        years_experience=15,
+        age=44,
+        specialization="Deep Command",
+        years_experience=18,
         is_active=True,
     )
     john = CrewMember(
-        member_id="CM002",
-        name="John Smith",
+        member_id="CM102",
+        name="Noah Kim",
         rank=Rank.LIEUTENANT,
-        age=34,
-        specialization="Navigation",
-        years_experience=8,
+        age=36,
+        specialization="Astrogation",
+        years_experience=9,
         is_active=True,
     )
     alice = CrewMember(
-        member_id="CM003",
-        name="Alice Johnson",
+        member_id="CM103",
+        name="Mila Ortega",
         rank=Rank.OFFICER,
-        age=29,
-        specialization="Engineering",
-        years_experience=6,
+        age=31,
+        specialization="Systems Engineering",
+        years_experience=7,
         is_active=True,
     )
-    crew = [alice, john, sarah]
+    crew = [sarah, john, alice]
 
     mission = SpaceMission(
-        mission_id="M2024_MARS",
-        mission_name="Mars Colony Establishment",
-        destination="Mars",
-        launch_date="2026-04-06",
-        duration_days=350,
+        mission_id="M2026_EUROPA",
+        mission_name="Europa Survey Initiative",
+        destination="Europa",
+        launch_date="2026-06-18T06:30:00",
+        duration_days=640,
         crew=crew,
-        budget_millions=3000,
+        budget_millions=1840.0,
     )
     print("Space Mission Crew Validation")
     print("=========================================")
@@ -134,6 +128,38 @@ def main():
             f"- {member.name} ({member.rank.value}) - {member.specialization}"
         )
     print("=========================================")
+    print("Expected validation error:")
+    try:
+        SpaceMission(
+            mission_id="M2026_DRILL",
+            mission_name="Outer Rim Recon Drill",
+            destination="Ceres",
+            launch_date="2026-06-21T11:15:00",
+            duration_days=45,
+            crew=[
+                CrewMember(
+                    member_id="CM110",
+                    name="Iris Vale",
+                    rank=Rank.OFFICER,
+                    age=30,
+                    specialization="Flight Ops",
+                    years_experience=6,
+                    is_active=True,
+                ),
+                CrewMember(
+                    member_id="CM111",
+                    name="Tomas Reed",
+                    rank=Rank.LIEUTENANT,
+                    age=35,
+                    specialization="Field Science",
+                    years_experience=8,
+                    is_active=True,
+                ),
+            ],
+            budget_millions=72.0,
+        )
+    except ValidationError as exc:
+        print(exc.errors()[0]["msg"])
 
 
 if __name__ == "__main__":

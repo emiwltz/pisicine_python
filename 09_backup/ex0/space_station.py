@@ -1,9 +1,5 @@
+from pydantic import BaseModel, Field, ValidationError
 from datetime import datetime
-from pydantic import (  # type: ignore[import-not-found]
-    BaseModel,
-    Field,
-    ValidationError,
-)
 
 
 class SpaceStation(BaseModel):
@@ -17,19 +13,19 @@ class SpaceStation(BaseModel):
     notes: str | None = Field(default=None, max_length=200)
 
 
-def main() -> None:
+def main():
     print("Space Station Data Validation")
     print("=" * 40)
     print("Valid station created:")
     station1 = SpaceStation(
-        station_id="ORB417",
-        name="Aurora Nexus",
-        crew_size=7,
-        power_level=73.8,
-        oxygen_level=88.6,
-        last_maintenance="2026-03-28T18:45:00",
+        station_id="ISS999",
+        name="ISS",
+        crew_size=5,
+        power_level=50,
+        oxygen_level=91.3,
+        last_maintenance="2026-04-05T12:00:00",
         is_operational=True,
-        notes="Deep-space observation platform above Europa.",
+        notes="Primary orbital research station.",
     )
     print(f"ID: {station1.station_id}")
     print(f"Name: {station1.name}")
@@ -44,14 +40,14 @@ def main() -> None:
     print("Expected validation error:")
     try:
         SpaceStation(
-            station_id="TIT204",
-            name="Titan Relay",
+            station_id="ISS002",
+            name="Lunar Gateway",
             crew_size=21,
-            power_level=42.5,
-            oxygen_level=76.0,
-            last_maintenance="2026-03-29T07:15:00",
+            power_level=20,
+            oxygen_level=10,
+            last_maintenance="2026-04-05T12:00:00",
             is_operational=True,
-            notes="Overflow staffing test case.",
+            notes="Crew capacity test.",
         )
     except ValidationError as exc:
         print(exc.errors()[0]["msg"])
