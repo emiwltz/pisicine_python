@@ -3,9 +3,9 @@ from functools import wraps
 import time
 
 
-def spell_timer(func: Callable) -> Callable:
+def spell_timer(func: Callable[..., str]) -> Callable[..., str]:
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: object, **kwargs: object) -> str:
         print(f"Casting {func.__name__}...")
         start = time.perf_counter()
         result = func(*args, **kwargs)
@@ -17,18 +17,18 @@ def spell_timer(func: Callable) -> Callable:
     return wrapper
 
 
-def power_validator(min_power: int) -> Callable:
-    def decorator(func: Callable) -> Callable:
+def power_validator(
+    min_power: int,
+) -> Callable[[Callable[..., str]], Callable[..., str]]:
+    def decorator(func: Callable[..., str]) -> Callable[..., str]:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: object, **kwargs: object) -> str:
             if "power" in kwargs:
                 power = kwargs["power"]
-            elif args and isinstance(args[0], int):
-                # Cas fonction standalone : func(power, ...)
-                power = args[0]
             elif len(args) >= 3 and isinstance(args[2], int):
-                # Cas méthode : func(self, spell_name, power)
                 power = args[2]
+            elif args and isinstance(args[0], int):
+                power = args[0]
             else:
                 return "Insufficient power for this spell"
 
@@ -42,10 +42,12 @@ def power_validator(min_power: int) -> Callable:
     return decorator
 
 
-def retry_spell(max_attempts: int) -> Callable:
-    def decorator(func: Callable) -> Callable:
+def retry_spell(
+    max_attempts: int,
+) -> Callable[[Callable[..., str]], Callable[..., str]]:
+    def decorator(func: Callable[..., str]) -> Callable[..., str]:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: object, **kwargs: object) -> str:
             for attempt in range(1, max_attempts + 1):
                 try:
                     return func(*args, **kwargs)
@@ -87,6 +89,14 @@ def iceball(power: int) -> str:
     return "Iceball cast!"
 
 
+def make_failing_spell() -> Callable[[], str]:
+    @retry_spell(3)
+    def failing_spell() -> str:
+        raise ValueError("Spell failed")
+
+    return failing_spell
+
+
 def make_unstable_spell() -> Callable[[], str]:
     attempts = 0
 
@@ -101,7 +111,7 @@ def make_unstable_spell() -> Callable[[], str]:
     return unstable_spell
 
 
-def main():
+def main() -> None:
     print("Testing spell timer...")
     result = fireball()
     print(f"Result: {result}")
@@ -113,6 +123,8 @@ def main():
     print()
 
     print("Testing retrying spell...")
+    failing_spell = make_failing_spell()
+    print(failing_spell())
     unstable_spell = make_unstable_spell()
     print(unstable_spell())
     print()

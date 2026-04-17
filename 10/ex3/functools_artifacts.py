@@ -1,11 +1,11 @@
 from collections.abc import Callable
-from typing import Any
+import functools
 import operator
-from functools import reduce, partial, lru_cache, singledispatch
+from typing import Any
 
 
 def spell_reducer(spells: list[int], operation: str) -> int:
-    operations = {
+    operations: dict[str, Callable[[int, int], int]] = {
         "add": operator.add,
         "multiply": operator.mul,
         "max": max,
@@ -13,21 +13,21 @@ def spell_reducer(spells: list[int], operation: str) -> int:
     }
     if not spells:
         return 0
-    try:
-        result = reduce(operations[operation], spells)
-        return result
-    except KeyError:
-        return "error: unknown operation"
+    if operation not in operations:
+        raise ValueError(f"Unknown operation: {operation}")
+    return functools.reduce(operations[operation], spells)
 
 
 def base_enchantment(power: int, element: str, target: str) -> str:
-    return f"{power}pv attack of type: {element} on {target}"
+    return f"{element.title()} enchantment strikes {target} with {power} power"
 
 
-def partial_enchanter(base_enchantment: Callable) -> dict[str, Callable]:
-    special1 = partial(base_enchantment, 50, "fire")
-    special2 = partial(base_enchantment, 50, "ice")
-    special3 = partial(base_enchantment, 50, "lightning")
+def partial_enchanter(
+    base_enchantment: Callable[[int, str, str], str],
+) -> dict[str, Callable[[str], str]]:
+    special1 = functools.partial(base_enchantment, 50, "fire")
+    special2 = functools.partial(base_enchantment, 50, "ice")
+    special3 = functools.partial(base_enchantment, 50, "lightning")
 
     return {
         "fire": special1,
@@ -36,7 +36,7 @@ def partial_enchanter(base_enchantment: Callable) -> dict[str, Callable]:
     }
 
 
-@lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def memoized_fibonacci(n: int) -> int:
     if n < 0:
         raise ValueError("n must be >= 0")
@@ -46,7 +46,7 @@ def memoized_fibonacci(n: int) -> int:
 
 
 def spell_dispatcher() -> Callable[[Any], str]:
-    @singledispatch
+    @functools.singledispatch
     def dispatch(spell: Any) -> str:
         return "Unknown spell type"
 
@@ -65,13 +65,14 @@ def spell_dispatcher() -> Callable[[Any], str]:
     return dispatch
 
 
-def main():
-    lst = [1, 2, 3, 4]
+def main() -> None:
+    spell_powers = [10, 20, 30, 40]
+
     print("Testing spell reducer...")
-    print("Add:", spell_reducer(lst, "add"))
-    print("Multiply:", spell_reducer(lst, "multiply"))
-    print("Max:", spell_reducer(lst, "max"))
-    print("Min:", spell_reducer(lst, "min"))
+    print("Sum:", spell_reducer(spell_powers, "add"))
+    print("Product:", spell_reducer(spell_powers, "multiply"))
+    print("Max:", spell_reducer(spell_powers, "max"))
+    print("Min:", spell_reducer(spell_powers, "min"))
     print()
 
     print("Testing partial enchanter...")
